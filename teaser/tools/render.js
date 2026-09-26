@@ -3,6 +3,7 @@
 //   node tools/render.js                  -> build/bundle-of-brave-fete-teaser.mp4 (1080p60)
 //   node tools/render.js --stills 0.5,3,8 -> build/stills/*.png (quick look at given seconds)
 //   options: --fps 60  --workers 4  --blur 3 (motion-blur sub-samples)
+//   invite film: --page invite.html --dur 20 --music invite-music.wav --out bundle-of-brave-fete-invite.mp4
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -14,7 +15,8 @@ const BUILD = path.join(ROOT, 'build');
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf('--' + k); return i >= 0 ? args[i + 1] : d; };
 const FPS = +opt('fps', 60), WORKERS = +opt('workers', 4), BLUR = +opt('blur', 3);
-const DUR = 15;
+const DUR = +opt('dur', 15);
+const PAGE = opt('page', 'index.html'), MUSIC = opt('music', 'music.wav'), OUT = opt('out', 'bundle-of-brave-fete-teaser.mp4');
 const FFMPEG = execFileSync('python3', ['-c', 'import imageio_ffmpeg as i;print(i.get_ffmpeg_exe())']).toString().trim();
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.ttf': 'font/ttf', '.wav': 'audio/wav', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
@@ -33,7 +35,7 @@ async function openPage(browser, port) {
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   page.on('pageerror', e => console.error('PAGE ERROR', e.message));
   page.on('console', m => { if (m.type() === 'error') console.error('console:', m.text()); });
-  await page.goto(`http://localhost:${port}/src/index.html`);
+  await page.goto(`http://localhost:${port}/src/${PAGE}`);
   await page.evaluate(() => window.ready);
   await page.evaluate(([n, f]) => window.setMotion(n, 0.5, f), [BLUR, FPS]);
   return page;
@@ -57,7 +59,7 @@ async function stills(browser, port, times) {
 
 async function segment(browser, port, k, f0, f1) {
   const page = await openPage(browser, port);
-  const out = path.join(BUILD, `seg${k}.mp4`);
+  const out = path.join(BUILD, `seg-${PAGE}-${k}.mp4`);
   const ff = spawn(FFMPEG, ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '14', '-pix_fmt', 'yuv420p', '-r', String(FPS), out]);
   const done = new Promise((res, rej) => ff.on('close', c => (c ? rej(new Error('ffmpeg ' + c)) : res())));
@@ -84,8 +86,8 @@ async function segment(browser, port, k, f0, f1) {
     const segs = await Promise.all([...Array(WORKERS)].map((_, k) => segment(browser, port, k, k * per, Math.min(total, (k + 1) * per))));
     const list = path.join(BUILD, 'segments.txt');
     fs.writeFileSync(list, segs.map(s => `file '${s}'`).join('\n'));
-    const out = path.join(BUILD, 'bundle-of-brave-fete-teaser.mp4');
-    execFileSync(FFMPEG, ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-i', path.join(BUILD, 'music.wav'),
+    const out = path.join(BUILD, OUT);
+    execFileSync(FFMPEG, ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-i', path.join(BUILD, MUSIC),
       '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-shortest', '-movflags', '+faststart', out]);
     segs.forEach(s => fs.unlinkSync(s)); fs.unlinkSync(list);
     console.log(`done in ${((Date.now() - t0) / 1000).toFixed(0)}s ->`, out);

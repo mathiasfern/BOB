@@ -21,6 +21,24 @@ Everything in the video is generated from code: the kinetic type, icons, confett
 | 11.25 | 24 | BUNDLE OF BRAVE converges, FETE slams on the brass stabs, gem star crowns it |
 | 13.13 | 28 | End card: COMING THIS CHRISTMAS ribbon, "presented by Bundle of Brave", light sweep on the final hit |
 
+## Film 2 — 20 s invitation (slower, heartfelt cut)
+
+`bundle-of-brave-fete-invite.mp4`: 1920×1080, 60 fps, 20.0 s. The score is 96 BPM in G major (32 beats = 20 s), from `tools/compose_invite.py`. The angle here is the heart behind the fete, not hype. The camera moves between four scrapbook pages:
+
+| Time | Beat | Page |
+|---|---|---|
+| 0–5 s | 0–8 | **The wish.** A crayon star is drawn on craft paper, then "every brave little heart / HAS A WISH". |
+| 5–10 s | 8–16 | **The scrapbook.** THIS CHRISTMAS, four polaroids of the fete drop in and develop, then "a day to bring everyone together". |
+| 10–15 s | 16–24 | **The diorama.** A paper-cut fete at dusk (ferris wheel, stalls, bunting, balloons). The tags GAMES, FUN ACTIVITIES, ENTERTAINMENT, LAUGHTER and FESTIVE VIBES are hung one by one. |
+| 15–20 s | 24–32 | **The invitation.** The wax seal pops, the envelope opens and the card rises: BUNDLE OF BRAVE FETE, COMING THIS CHRISTMAS, presented by Bundle of Brave. A light sweep plays on the final chime. |
+
+`src/invite.js` reuses the teaser engine (`window.BOB`), and its preview lives at `src/invite.html?play`.
+
+```bash
+python3 tools/compose_invite.py
+NODE_PATH=$(npm root -g) node tools/render.js --page invite.html --dur 20 --music invite-music.wav --out bundle-of-brave-fete-invite.mp4
+```
+
 ## Rebuild
 
 ```bash

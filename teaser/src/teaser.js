@@ -1283,7 +1283,16 @@ function setupBursts() {
 // ------------------------------------------------------------------ boot
 let motionSamples = 1, shutter = 0.5, fps = 60;
 const acc = mkCanvas(W, H), accG = acc.getContext('2d');
+// other films (src/invite.js) reuse this engine and swap in their own draw()
+window.BOB = {
+  W, H, CX, CY, TAU, C, FESTIVE, clamp, lerp, inv, E, spring, rng, hash, noise1, mkCanvas, rrect, starPath,
+  text, layout, slap, spr, pop, S, IMG, ICON, bake, radialBg, sunburst, harlequin, halftone, stripes, shockwave,
+  flash, glowDot, fairyLights, sparkles, snow, BURSTS, addBurst, drawConfetti, overlayTextures, loadImg,
+  draw: null,
+};
+const frameFn = () => window.BOB.draw || drawFrame;
 window.renderFrame = (t) => {
+  const drawFrame = frameFn();
   if (motionSamples <= 1) { drawFrame(ctx, t); return; }
   // motion blur: average sub-frames across the shutter interval
   for (let i = 0; i < motionSamples; i++) {
@@ -1313,7 +1322,7 @@ window.ready = (async () => {
 })();
 
 // interactive preview: open src/index.html?play (click to start with music)
-if (location.search.includes('play')) {
+if (location.search.includes('play') && !window.BOB_EXTERNAL) {
   document.body.classList.add('preview');
   window.ready.then(() => {
     const audio = new Audio('../build/music.wav');
