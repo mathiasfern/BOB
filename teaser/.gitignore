@@ -1,0 +1,4 @@
+node_modules/
+build/stills/
+build/seg*.mp4
+build/segments.txt
