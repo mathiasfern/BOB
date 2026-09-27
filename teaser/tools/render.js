@@ -3,6 +3,7 @@
 //   node tools/render.js                  -> build/bundle-of-brave-fete-teaser.mp4 (1080p60)
 //   node tools/render.js --stills 0.5,3,8 -> build/stills/*.png (quick look at given seconds)
 //   options: --fps 60  --workers 4  --blur 3 (motion-blur sub-samples)
+//   vertical: --w 1080 --h 1920
 //   invite film: --page invite.html --dur 20 --music invite-music.wav --out bundle-of-brave-fete-invite.mp4
 const http = require('http');
 const fs = require('fs');
@@ -16,6 +17,7 @@ const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf('--' + k); return i >= 0 ? args[i + 1] : d; };
 const FPS = +opt('fps', 60), WORKERS = +opt('workers', 4), BLUR = +opt('blur', 3);
 const DUR = +opt('dur', 15);
+const VW = +opt('w', 1920), VH = +opt('h', 1080);
 const PAGE = opt('page', 'index.html'), MUSIC = opt('music', 'music.wav'), OUT = opt('out', 'bundle-of-brave-fete-teaser.mp4');
 const FFMPEG = execFileSync('python3', ['-c', 'import imageio_ffmpeg as i;print(i.get_ffmpeg_exe())']).toString().trim();
 
@@ -32,7 +34,7 @@ function serve() {
 }
 
 async function openPage(browser, port) {
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width: VW, height: VH }, deviceScaleFactor: 1 });
   page.on('pageerror', e => console.error('PAGE ERROR', e.message));
   page.on('console', m => { if (m.type() === 'error') console.error('console:', m.text()); });
   await page.goto(`http://localhost:${port}/src/${PAGE}`);
@@ -43,7 +45,7 @@ async function openPage(browser, port) {
 
 async function grab(page, t) {
   await page.evaluate(t => window.renderFrame(t), t);
-  return page.screenshot({ type: 'png', clip: { x: 0, y: 0, width: 1920, height: 1080 } });
+  return page.screenshot({ type: 'png', clip: { x: 0, y: 0, width: VW, height: VH } });
 }
 
 async function stills(browser, port, times) {
