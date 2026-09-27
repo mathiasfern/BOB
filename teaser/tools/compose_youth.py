@@ -429,22 +429,23 @@ place(blip(88, 0.9), 5.5, pan=0.35, send=0.25)
 place(blip(91, 0.9), 5.75, pan=-0.35, send=0.25)
 
 # ----- b6-8: build into the drop (filtered groove, reverse cymbal, riser, gap)
-for b in (6, 6.5, 7, 7.5):
-    kk = filt(kick(0.6, tone=0.7), 'lowpass', 900)
-    place(kk, b, gain=0.55 + 0.1 * (b - 6), bus='drums')
+for b in (6, 7):
+    kk = filt(kick(0.6, tone=0.7), 'lowpass', 500)
+    place(kk, b, gain=0.4, bus='drums')
 for i in range(8):
     bb = 6 + i * 0.25 + (SWING - 0.125) * (i % 2)
     if bb < 7.75:
-        place(hat(i % 2 == 0, 0.5 + 0.06 * i), bb, pan=0.25, bus='drums')
-place(clap(0.5), 7, send=0.4, bus='drums')
+        place(hat(False, 0.35 + 0.06 * i), bb, pan=0.25, bus='drums')
+place(filt(clap(0.4), 'lowpass', 2500), 7, send=0.4, bus='drums')
 place(reverse_cymbal(1.75, 1.0), 6, pan=0.0, bus='fx')
-rz = riser(1.75, 300, 7000, 0.8)
+rz = riser(1.75, 300, 7000, 0.6)
 place(rz, 6, bus='fx')
 bl = pad([57, 61, 64, 67], 1.75 * BEAT, cutoff=1100, a=0.9, r=0.03, g=1.2)
 place(bl * np.linspace(0.2, 1, len(bl)), 6, send=0.3)
 
 # ----- b8-20: THE DROP
-place(crash(0.8, 2.5), 8, pan=0.2, send=0.2, bus='fx')
+place(crash(1.1, 2.5), 8, pan=0.2, send=0.2, bus='fx')
+place(kick(1.5, dur=0.45, tone=1.2), 8, gain=0.5, bus='drums')
 for bi, b0 in enumerate(range(8, 16, 4)):
     ch = chord_at(b0)
     groove_bar(b0, variant=bi % 2)
@@ -602,7 +603,7 @@ mix = []
 for c in (0, 1):
     subm = filt(BUS['sub'][c], 'lowpass', 180) * sub_duck
     music = BUS['music'][c] * duck + rev[c] * (0.6 + 0.4 * duck)
-    x = BUS['drums'][c] * 0.9 + music + BUS['fx'][c] * 0.9 + subm * 0.95
+    x = BUS['drums'][c] * 0.9 + music + BUS['fx'][c] * 0.9 + subm * 0.8
     x = filt(x, 'highpass', 28)
     x = filt(x, 'lowpass', 16000)
     mix.append(x)
