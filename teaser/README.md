@@ -28,8 +28,8 @@ Everything in the video is generated from code: the kinetic type, icons, confett
 | Time | Beat | Page |
 |---|---|---|
 | 0–5 s | 0–8 | **The wish.** A crayon star is drawn on craft paper, then "every brave little heart / HAS A WISH". |
-| 5–10 s | 8–16 | **The scrapbook.** THIS CHRISTMAS, four polaroids of the fete drop in and develop, then "a day to bring everyone together". |
-| 10–15 s | 16–24 | **The diorama.** A paper-cut fete at dusk (ferris wheel, stalls, bunting, balloons). The tags GAMES, FUN ACTIVITIES, ENTERTAINMENT, LAUGHTER and FESTIVE VIBES are hung one by one. |
+| 5–10 s | 8–16 | **The scrapbook.** THIS CHRISTMAS, three polaroids (games, music & shows, festive fun) drop in and develop, then "a day to bring everyone together". |
+| 10–15 s | 16–24 | **The diorama.** A paper-cut fete at dusk (a lit Christmas tree, stalls, bunting, balloons). The tags GAMES, FUN ACTIVITIES, ENTERTAINMENT, LAUGHTER and FESTIVE VIBES are hung one by one. |
 | 15–20 s | 24–32 | **The invitation.** The wax seal pops, the envelope opens and the card rises: BUNDLE OF BRAVE FETE, COMING THIS CHRISTMAS, presented by Bundle of Brave. A light sweep plays on the final chime. |
 
 `src/invite.js` reuses the teaser engine (`window.BOB`), and its preview lives at `src/invite.html?play`.

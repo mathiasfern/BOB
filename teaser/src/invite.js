@@ -62,42 +62,36 @@ function tape(g, x, y, w, h, rot, col = 'rgba(251,237,195,0.8)') {
 }
 
 // ------------------------------------------------------------------ fete props
-function ferris(g, x, y, r, rot, t, { lights = true, scale = 1 } = {}) {
-  g.save(); g.translate(x, y);
-  // A-frame legs
-  g.strokeStyle = '#3B1A12'; g.lineWidth = 10 * scale; g.lineCap = 'round';
-  g.beginPath(); g.moveTo(0, 0); g.lineTo(-r * 0.62, r * 1.18); g.moveTo(0, 0); g.lineTo(r * 0.62, r * 1.18); g.stroke();
-  // spokes + rims
-  g.strokeStyle = C.cream; g.lineWidth = 3 * scale;
-  const n = 12;
-  g.beginPath();
-  for (let i = 0; i < n; i++) { const a = rot + (i / n) * TAU; g.moveTo(0, 0); g.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
-  g.stroke();
-  g.lineWidth = 7 * scale; g.strokeStyle = C.gold; g.beginPath(); g.arc(0, 0, r, 0, TAU); g.stroke();
-  g.lineWidth = 3 * scale; g.strokeStyle = C.cream; g.beginPath(); g.arc(0, 0, r * 0.82, 0, TAU); g.stroke();
-  if (lights) {
-    g.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < 24; i++) {
-      const a = rot + (i / 24) * TAU, on = 0.5 + 0.5 * Math.sin(t * 5 + i * 0.8);
-      glowDot(g, Math.cos(a) * r, Math.sin(a) * r, 18 * scale, `rgba(255,220,140,${0.5 * on + 0.2})`);
-    }
-    g.globalCompositeOperation = 'source-over';
+// a tall paper-cut Christmas tree with twinkling lights (the diorama's centrepiece)
+function bigTree(g, x, y, k, t) {
+  g.save(); g.translate(x, y); g.scale(k, k);
+  g.fillStyle = '#4A2414'; g.fillRect(-22, -20, 44, 60);
+  const tiers = [[-470, 130, -300], [-350, 190, -170], [-220, 250, -20]];
+  tiers.forEach(([top, hw, base], i) => {
+    g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.moveTo(8, top + 8); g.lineTo(hw + 8, base + 8); g.lineTo(-hw + 8, base + 8); g.closePath(); g.fill();
+    g.fillStyle = i % 2 ? '#1C7A44' : '#16643A';
+    g.beginPath(); g.moveTo(0, top); g.lineTo(hw, base);
+    for (let j = 6; j >= -6; j--) g.lineTo((hw * j) / 6, base + (j % 2 ? 14 : 0));
+    g.closePath(); g.fill();
+  });
+  // garland of lights
+  g.globalCompositeOperation = 'lighter';
+  const cols = ['rgba(255,77,77,', 'rgba(255,211,77,', 'rgba(110,200,255,', 'rgba(255,123,216,'];
+  for (let i = 0; i < 26; i++) {
+    const u = i / 25, yy = -430 + u * 400, hw = 40 + u * 210, xx = Math.sin(u * 14) * hw * 0.85;
+    const on = 0.45 + 0.55 * Math.max(0, Math.sin(t * 3 + i * 1.3));
+    glowDot(g, xx, yy, 26, cols[i % 4] + (0.7 * on) + ')');
   }
-  // gondolas always hang down
-  const cols = [C.red, C.gold, C.holly, C.sky, C.pink, C.orange];
-  for (let i = 0; i < 8; i++) {
-    const a = rot + (i / 8) * TAU, gx = Math.cos(a) * r, gy = Math.sin(a) * r;
-    const sw = Math.sin(t * 2 + i) * 0.08;
-    g.save(); g.translate(gx, gy); g.rotate(sw);
-    g.strokeStyle = '#3B1A12'; g.lineWidth = 3 * scale; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, 16 * scale); g.stroke();
-    g.fillStyle = cols[i % cols.length];
-    rrect(g, -17 * scale, 14 * scale, 34 * scale, 26 * scale, 7 * scale); g.fill();
-    g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(-17 * scale, 14 * scale, 34 * scale, 5 * scale);
-    g.restore();
+  g.globalCompositeOperation = 'source-over';
+  for (let i = 0; i < 26; i++) {
+    const u = i / 25, yy = -430 + u * 400, hw = 40 + u * 210, xx = Math.sin(u * 14) * hw * 0.85;
+    g.fillStyle = BULBS[i % 4]; g.beginPath(); g.arc(xx, yy, 6, 0, TAU); g.fill();
   }
-  g.fillStyle = C.gold; g.beginPath(); g.arc(0, 0, 12 * scale, 0, TAU); g.fill();
+  g.fillStyle = C.sun; starPath(g, 0, -480, 5, 46, 20); g.fill();
+  g.globalCompositeOperation = 'lighter'; glowDot(g, 0, -480, 120, 'rgba(255,220,120,0.5)'); g.globalCompositeOperation = 'source-over';
   g.restore();
 }
+const BULBS = ['#FF4D4D', '#FFD34D', '#6EC8FF', '#FF7BD8'];
 function stall(g, x, y, w, h, a, b2, t, flag = C.gold) {
   g.save(); g.translate(x, y);
   g.fillStyle = 'rgba(30,5,5,.35)'; g.fillRect(-w / 2 + 12, -h + 14, w, h);
@@ -242,12 +236,7 @@ function panelWish(g, b) {
 
 // ------------------------------------------------------------------ panel 2: the scrapbook
 function vignette(g, kind, t, w, h) {
-  if (kind === 0) { // ferris wheel at dusk
-    const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#4A1030'); gr.addColorStop(0.7, '#E2703A'); gr.addColorStop(1, '#FCBD3F');
-    g.fillStyle = gr; g.fillRect(0, 0, w, h);
-    ferris(g, w * 0.5, h * 0.5, w * 0.33, t * 0.35, t, { scale: 0.7 });
-    g.fillStyle = '#3A0E14'; g.fillRect(0, h * 0.86, w, h * 0.14);
-  } else if (kind === 1) { // game stall
+  if (kind === 1) { // game stall
     g.fillStyle = '#3A0A10'; g.fillRect(0, 0, w, h);
     stall(g, w / 2, h * 0.96, w * 0.78, h * 0.8, C.red, C.cream, t);
     spr(g, S.target, w * 0.5, h * 0.52, w * 0.3, 0);
@@ -279,10 +268,9 @@ function vignette(g, kind, t, w, h) {
   }
 }
 const POLAROIDS = [
-  { x: 330, y: 590, r: -0.09, bs: 7.9, k: 0, cap: 'rides & lights' },
-  { x: 750, y: 620, r: 0.05, bs: 9.5, k: 1, cap: 'games' },
-  { x: 1170, y: 590, r: -0.04, bs: 11, k: 2, cap: 'music & shows' },
-  { x: 1590, y: 625, r: 0.08, bs: 12.5, k: 3, cap: 'festive fun' },
+  { x: 520, y: 600, r: -0.06, bs: 9.5, k: 1, cap: 'games' },
+  { x: 960, y: 580, r: 0.04, bs: 11, k: 2, cap: 'music & shows' },
+  { x: 1400, y: 610, r: -0.05, bs: 12.5, k: 3, cap: 'festive fun' },
 ];
 function polaroid(g, P, b) {
   const x = (b - P.bs) * BEAT;
@@ -386,7 +374,7 @@ function panelDiorama(g, b) {
   g.fillStyle = C.cream; g.beginPath(); g.arc(1640 - pan * 60, 470, 70, 0, TAU); g.fill();
   g.fillStyle = 'rgba(0,0,0,.08)'; g.beginPath(); g.arc(1660 - pan * 60, 460, 60, 0, TAU); g.fill();
   hills(g, 700, 50, 0.004, 1, '#5A1420', null, pan * 200);
-  ferris(g, 520 - pan * 160, 520, 250, t * 0.25, t, { scale: 1.2 });
+  bigTree(g, 470 - pan * 160, 800, 1.25, t);
   hills(g, 800, 30, 0.006, 4, '#3E0E18', 'rgba(255,190,120,.25)', pan * 420);
   // stalls on the mid layer
   const mid = -pan * 380;
