@@ -39,6 +39,27 @@ python3 tools/compose_invite.py
 NODE_PATH=$(npm root -g) node tools/render.js --page invite.html --dur 20 --music invite-music.wav --out bundle-of-brave-fete-invite.mp4
 ```
 
+## Film 3: "christmas plans" (20 s, vertical 9:16, for 16–25s)
+
+`bundle-of-brave-fete-groupchat.mp4`: 1080×1920, 60 fps, 20.0 s, made for Reels and TikTok. The score is minimal UK garage at 120 BPM (40 beats = 20 s), from `tools/compose_youth.py`.
+
+**Idea:** a group chat can't agree on christmas plans. Someone drops a link, and it opens into a riso-printed gig-poster lineup. Back in the chat there's one plain line about the cause, then everyone's in, the group gets renamed, and the end card reads *christmas plans: sorted.* It's phone-native and built to be shared ("send this to the group chat"). The brand's cut-paper letters appear as ransom-note tiles instead of stickers.
+
+| Time | What happens |
+|---|---|
+| 0–4 s | POV: your group chat. Messages slam in on the beat, typing dots, a link card lands, "just open it". |
+| 4–10 s | The card opens into a Swiss-grid poster: BUNDLE OF BRAVE presents games / fun activities / entertainment / laughter / festive vibes, then *this christmas*, with riso misregistration. |
+| 10–13 s | The beat drops out. "ok but what's bundle of brave?" gets the reply "youth-led. they fulfil the last wishes of kids with terminal cancer." Everything else dims. |
+| 13–16 s | The groove returns. "ok i'm in" / "in." / "in." / "in. bringing my cousins". The group is renamed "bundle of brave fete". |
+| 16–20 s | The chat tears away to the end card: BUNDLE OF BRAVE FETE, this christmas, christmas plans: sorted, send this to the group chat. |
+
+**How it was chosen:** three parallel brainstorms looked at it through internet culture, editorial design and purpose. Two independently landed on the group chat, and the editorial pitch supplied the lineup-poster look. Deliberately left out: rides jokes, "not your parents' gala", hype "drop" language next to the cause, and any claim about where ticket money goes. The chat names are fictional.
+
+```bash
+python3 tools/compose_youth.py
+NODE_PATH=$(npm root -g) node tools/render.js --page youth.html --w 1080 --h 1920 --dur 20 --music youth-music.wav --out bundle-of-brave-fete-groupchat.mp4
+```
+
 ## Rebuild
 
 ```bash
